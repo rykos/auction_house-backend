@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ah_backend.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
@@ -59,6 +59,8 @@ namespace ah_backend.Controllers
 
                 return Ok(new
                 {
+                    id = user.Id,
+                    username = user.UserName,
                     token = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo
                 });

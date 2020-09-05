@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,11 +18,27 @@ namespace ah_backend
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            string path = default, key = default;
+            return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>().UseKestrel().ConfigureServices((context, services) =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    path = context.Configuration["Certificate:Path"];
+                    key = context.Configuration["Certificate:Key"];
+                }).ConfigureKestrel(serverOptions =>
+                {
+                    serverOptions.ConfigureHttpsDefaults(x =>
+                    {
+                        if (path != default && key != default)
+                        {
+                            var clientCertificate = new X509Certificate2(path, key);
+                            x.ServerCertificate = clientCertificate;
+                        }
+                    });
                 });
+            });
+        }
     }
 }
