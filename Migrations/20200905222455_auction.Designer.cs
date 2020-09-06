@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ah_backend.Authentication;
 
 namespace ah_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200905222455_auction")]
+    partial class auction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,10 +217,6 @@ namespace ah_backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreationTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime");
-
                     b.Property<string>("CreatorId")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
@@ -229,9 +227,6 @@ namespace ah_backend.Migrations
 
                     b.Property<byte[]>("Icon")
                         .HasColumnType("mediumblob");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("double");
 
                     b.Property<string>("Title")
                         .IsRequired()

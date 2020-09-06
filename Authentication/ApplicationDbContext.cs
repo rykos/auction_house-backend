@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using ah_backend.Models;
 
 namespace ah_backend.Authentication
 {
@@ -10,5 +11,7 @@ namespace ah_backend.Authentication
         {
             base.OnModelCreating(builder);
         }
+
+        public DbSet<Auction> Auctions { get; set; }
     }
 }
