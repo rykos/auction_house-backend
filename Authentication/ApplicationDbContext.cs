@@ -13,5 +13,6 @@ namespace ah_backend.Authentication
         }
 
         public DbSet<Auction> Auctions { get; set; }
+        public DbSet<FinishedAuction> FinishedAuctions { get; set; }
     }
 }
