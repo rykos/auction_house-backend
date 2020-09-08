@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using System.Net;
 using System.Security.Claims;
+using System;
 
 namespace ah_backend.Controllers
 {
@@ -30,10 +31,17 @@ namespace ah_backend.Controllers
         }
 
         [HttpGet]
+        [Route("{skip}/{amount}")]
+        public Auction[] GetAuctions(int skip, int amount)
+        {
+            return this.dbContext.Auctions?.Skip(skip).Take(amount)?.ToArray();
+        }
+
+        [HttpGet]
         [Route("{id}")]
         public Auction GetAuction(int id)
         {
-            return dbContext.Auctions.First(x => x.Id == id);
+            return dbContext.Auctions.FirstOrDefault(x => x.Id == id);
         }
 
         [Authorize]
@@ -46,7 +54,7 @@ namespace ah_backend.Controllers
             {
                 return null;
             }
-            return dbContext.Auctions.Where(x => x.CreatorId == userId).ToArray();
+            return dbContext.Auctions.Where(x => x.CreatorId == userId)?.ToArray();
         }
 
         [Authorize]
@@ -64,6 +72,34 @@ namespace ah_backend.Controllers
                 }
             }
             return BadRequest();
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("mockAuction/{amount}")]
+        public List<Auction> CreateRandomAuction(int amount)
+        {
+            if (amount < 1)
+            {
+                return null;
+            }
+            Random rnd = new Random();
+            List<Auction> newAuctions = new List<Auction>();
+            for (int i = 0; i < amount; i++)
+            {
+                string[] titles = { "Buty", "Rekawice", "Naszyjnik", "Pas", "Peleryna" };
+                Auction auction = new Auction()
+                {
+                    CreatorId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    Title = titles[rnd.Next(0, titles.Length)],
+                    Description = titles[rnd.Next(0, titles.Length)],
+                    Price = rnd.Next(10, 1000) + (rnd.Next(0, 101) / 100d)
+                };
+                newAuctions.Add(auction);
+                dbContext.AddAsync(auction);
+            }
+            dbContext.SaveChanges();
+            return newAuctions;
         }
     }
 }

@@ -9,7 +9,7 @@ using ah_backend.Authentication;
 namespace ah_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200907163256_finishedAuctions")]
+    [Migration("20200907160046_finishedAuctions")]
     partial class finishedAuctions
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -259,8 +259,7 @@ namespace ah_backend.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("BuyerId")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100);
+                        .HasColumnType("varchar(100)");
 
                     b.HasDiscriminator().HasValue("FinishedAuction");
                 });
