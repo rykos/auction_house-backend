@@ -153,6 +153,9 @@ namespace ah_backend.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<double>("Balance")
+                        .HasColumnType("double");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -220,7 +223,6 @@ namespace ah_backend.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("CreatorId")
-                        .IsRequired()
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("Description")

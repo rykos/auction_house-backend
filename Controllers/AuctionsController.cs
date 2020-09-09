@@ -9,10 +9,13 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Security.Claims;
 using System;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace ah_backend.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class AuctionsController : ControllerBase
     {
         private readonly ApplicationDbContext dbContext;
@@ -34,7 +37,7 @@ namespace ah_backend.Controllers
         [Route("{skip}/{amount}")]
         public Auction[] GetAuctions(int skip, int amount)
         {
-            return this.dbContext.Auctions?.Skip(skip).Take(amount)?.ToArray();
+            return this.dbContext.Auctions?.OrderByDescending(x => x.CreationTime).Skip(skip).Take(amount)?.ToArray();
         }
 
         [HttpGet]
@@ -54,16 +57,31 @@ namespace ah_backend.Controllers
             {
                 return null;
             }
-            return dbContext.Auctions.Where(x => x.CreatorId == userId)?.ToArray();
+            return dbContext.Auctions.Where(x => x.CreatorId == userId)?.OrderByDescending(x => x.CreationTime).ToArray();
         }
 
         [Authorize]
         [HttpPost]
-        public IActionResult CreateAuction([FromBody] Auction auction)
+        public IActionResult CreateAuction([FromForm] Auction auction, [FromForm] IFormFile icon)
         {
-            if (auction.Title != default && auction.Description != default && auction.Price != default)
+            if (auction != default && auction.Title != default && auction.Description != default && auction.Price != default)
             {
                 auction.CreatorId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                if (icon != null)
+                {
+                    if (icon.Length < 16000000)
+                    {
+                        using (MemoryStream memoryStream = new MemoryStream())
+                        {
+                            icon.CopyTo(memoryStream);
+                            auction.Icon = memoryStream.ToArray();
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new Response { Status = "Error", Message = "Icon file size is too large" });
+                    }
+                }
                 Auction result = dbContext.Auctions.Add(auction).Entity;
                 dbContext.SaveChanges();
                 if (result != default)
@@ -71,7 +89,7 @@ namespace ah_backend.Controllers
                     return Created($"api/auctions/{result.Id}", result);
                 }
             }
-            return BadRequest();
+            return BadRequest(new Response { Status = "Error", Message = "Missing fields" });
         }
 
         [Authorize]

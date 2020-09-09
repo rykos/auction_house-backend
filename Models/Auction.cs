@@ -6,24 +6,22 @@ namespace ah_backend.Models
 {
     public class Auction
     {
-        [Required]
         public int Id { get; set; }
 
-        [Required]
         [Column(TypeName = "varchar(100)")]
         public string CreatorId { get; set; }
 
         [Column(TypeName = "mediumblob")]
         public byte[] Icon { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Tile is required")]
         [Column(TypeName = "varchar(100)")]
         public string Title { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Price is required")]
         public double Price { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

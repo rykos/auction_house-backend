@@ -9,8 +9,8 @@ using ah_backend.Authentication;
 namespace ah_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200905222318_auctions")]
-    partial class auctions
+    [Migration("20200909191442_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -155,6 +155,9 @@ namespace ah_backend.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<double>("Balance")
+                        .HasColumnType("double");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -209,6 +212,59 @@ namespace ah_backend.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("ah_backend.Models.Auction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("CreatorId")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Icon")
+                        .HasColumnType("mediumblob");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Auctions");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Auction");
+                });
+
+            modelBuilder.Entity("ah_backend.Models.FinishedAuction", b =>
+                {
+                    b.HasBaseType("ah_backend.Models.Auction");
+
+                    b.Property<DateTime>("BuyDateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("BuyerId")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100);
+
+                    b.HasDiscriminator().HasValue("FinishedAuction");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
