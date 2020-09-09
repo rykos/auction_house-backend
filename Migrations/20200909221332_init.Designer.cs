@@ -9,7 +9,7 @@ using ah_backend.Authentication;
 namespace ah_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200909191442_init")]
+    [Migration("20200909221332_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,7 +82,7 @@ namespace ah_backend.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
@@ -94,17 +94,19 @@ namespace ah_backend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -116,7 +118,7 @@ namespace ah_backend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("RoleId")
                         .HasColumnType("varchar(767)");
@@ -131,7 +133,7 @@ namespace ah_backend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("varchar(767)");
@@ -150,7 +152,8 @@ namespace ah_backend.Migrations
             modelBuilder.Entity("ah_backend.Authentication.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(256)")
+                        .HasMaxLength(256);
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");

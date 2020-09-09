@@ -95,7 +95,7 @@ namespace ah_backend.Controllers
         [Authorize]
         [HttpPost]
         [Route("mockAuction/{amount}")]
-        public List<Auction> CreateRandomAuction(int amount)
+        public async Task<List<object>> CreateRandomAuction(int amount)
         {
             if (amount < 1)
             {
@@ -103,21 +103,39 @@ namespace ah_backend.Controllers
             }
             Random rnd = new Random();
             List<Auction> newAuctions = new List<Auction>();
+            string[] titles = { "Buty", "Rekawice", "Naszyjnik", "Pas", "Peleryna" };
+
+            string[] filePaths = Directory.GetFiles(@"C:\develop\IMAGES\MOCK_RESOURCES");
+            string creatorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             for (int i = 0; i < amount; i++)
             {
-                string[] titles = { "Buty", "Rekawice", "Naszyjnik", "Pas", "Peleryna" };
-                Auction auction = new Auction()
+                using (FileStream fs = new FileStream(filePaths[rnd.Next(0, filePaths.Length)], FileMode.Open))
                 {
-                    CreatorId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    Title = titles[rnd.Next(0, titles.Length)],
-                    Description = titles[rnd.Next(0, titles.Length)],
-                    Price = rnd.Next(10, 1000) + (rnd.Next(0, 101) / 100d)
-                };
-                newAuctions.Add(auction);
-                dbContext.AddAsync(auction);
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        fs.CopyTo(ms);
+                        Auction auction = new Auction()
+                        {
+                            CreatorId = creatorId,
+                            Title = titles[rnd.Next(0, titles.Length)],
+                            Description = titles[rnd.Next(0, titles.Length)],
+                            Price = rnd.Next(10, 1000) + (rnd.Next(0, 101) / 100d),
+                            Icon = ms.ToArray()
+                        };
+                        newAuctions.Add(auction);
+                        await dbContext.AddAsync(auction);
+                    }
+                }
             }
-            dbContext.SaveChanges();
-            return newAuctions;
+            await dbContext.SaveChangesAsync();
+            return newAuctions.Select(x => new
+            {
+                id = x.Id,
+                title = x.Title,
+                description = x.Description,
+                price = x.Price
+            }).Cast<object>().ToList();
         }
     }
 }
