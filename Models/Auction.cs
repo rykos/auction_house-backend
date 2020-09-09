@@ -8,14 +8,13 @@ namespace ah_backend.Models
     {
         public int Id { get; set; }
 
-        [Column(TypeName = "varchar(100)")]
+        [MaxLength(100)]
         public string CreatorId { get; set; }
 
-        [Column(TypeName = "mediumblob")]
         public byte[] Icon { get; set; }
 
         [Required(ErrorMessage = "Tile is required")]
-        [Column(TypeName = "varchar(100)")]
+        [MaxLength(100)]
         public string Title { get; set; }
 
         [Required(ErrorMessage = "Description is required")]
