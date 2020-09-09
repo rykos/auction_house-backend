@@ -20,7 +20,8 @@ namespace ah_backend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -47,7 +48,8 @@ namespace ah_backend.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -57,7 +59,7 @@ namespace ah_backend.Migrations
 
                     b.Property<string>("RoleId")
                         .IsRequired()
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(128)");
 
                     b.HasKey("Id");
 
@@ -80,7 +82,7 @@ namespace ah_backend.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(128)");
 
                     b.HasKey("Id");
 
@@ -104,7 +106,7 @@ namespace ah_backend.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(128)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -116,10 +118,10 @@ namespace ah_backend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(128)");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(128)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -131,13 +133,15 @@ namespace ah_backend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("varchar(128)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(700)")
+                        .HasMaxLength(700);
 
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(700)")
+                        .HasMaxLength(700);
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
@@ -150,8 +154,8 @@ namespace ah_backend.Migrations
             modelBuilder.Entity("ah_backend.Authentication.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(256)")
-                        .HasMaxLength(256);
+                        .HasColumnType("varchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
