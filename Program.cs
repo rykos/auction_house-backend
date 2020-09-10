@@ -20,24 +20,9 @@ namespace ah_backend
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            string path = default, key = default;
             return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseStartup<Startup>().UseKestrel().ConfigureServices((context, services) =>
-                {
-                    path = context.Configuration["Certificate:Path"];
-                    key = context.Configuration["Certificate:Key"];
-                }).ConfigureKestrel(serverOptions =>
-                {
-                    serverOptions.ConfigureHttpsDefaults(x =>
-                    {
-                        if (path != default && key != default)
-                        {
-                            var clientCertificate = new X509Certificate2(path, key);
-                            x.ServerCertificate = clientCertificate;
-                        }
-                    });
-                });
+                webBuilder.UseStartup<Startup>().UseKestrel();
             });
         }
     }
