@@ -74,6 +74,8 @@ namespace ah_backend
             }
             app.UseCors("MyPolicy");
 
+            app.UseStaticFiles();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();

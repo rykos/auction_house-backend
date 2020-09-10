@@ -3,7 +3,7 @@
         {
             "database": "${workspaceFolder:ah-backend}/ahbackend.db",
             "driver": "SQLite",
-            "name": "ah-backend",
+            "name": "tak",
             "previewLimit": 50
         }
     ],

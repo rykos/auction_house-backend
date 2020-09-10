@@ -74,7 +74,13 @@ namespace ah_backend.Controllers
                         using (MemoryStream memoryStream = new MemoryStream())
                         {
                             icon.CopyTo(memoryStream);
-                            auction.Icon = memoryStream.ToArray();
+                            //auction.Icon = memoryStream.ToArray();
+                            string iconFileName = $"images/{auction.CreatorId}_{Guid.NewGuid().ToString()}_{icon.FileName}";
+                            auction.Icon = iconFileName;
+                            using (FileStream fs = new FileStream(Path.Combine("wwwroot", iconFileName), FileMode.Create))
+                            {
+                                fs.Write(memoryStream.ToArray());
+                            }
                         }
                     }
                     else
@@ -110,7 +116,8 @@ namespace ah_backend.Controllers
 
             for (int i = 0; i < amount; i++)
             {
-                using (FileStream fs = new FileStream(filePaths[rnd.Next(0, filePaths.Length)], FileMode.Open))
+                string filePath = filePaths[rnd.Next(0, filePaths.Length)];
+                using (FileStream fs = new FileStream(filePath, FileMode.Open))
                 {
                     using (MemoryStream ms = new MemoryStream())
                     {
@@ -121,8 +128,13 @@ namespace ah_backend.Controllers
                             Title = titles[rnd.Next(0, titles.Length)],
                             Description = titles[rnd.Next(0, titles.Length)],
                             Price = rnd.Next(10, 1000) + (rnd.Next(0, 101) / 100d),
-                            Icon = ms.ToArray()
                         };
+                        string iconFileName = $"images/{auction.CreatorId}_{Guid.NewGuid().ToString()}_{Path.GetFileName(filePath)}";
+                        using (FileStream fsc = new FileStream(Path.Combine("wwwroot", iconFileName), FileMode.Create))
+                        {
+                            fsc.Write(ms.ToArray());
+                        }
+                        auction.Icon = iconFileName;
                         newAuctions.Add(auction);
                         await dbContext.AddAsync(auction);
                     }
