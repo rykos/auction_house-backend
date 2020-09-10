@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
 using System.IO;
 using System.Net.Http;
 
@@ -36,7 +37,7 @@ namespace ah_backend
             services.AddControllers();
 
             //services.AddDbContext<ApplicationDbContext>(options => options.UseMySQL(Configuration.GetConnectionString("Default")));
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=ahbackend.db"));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
