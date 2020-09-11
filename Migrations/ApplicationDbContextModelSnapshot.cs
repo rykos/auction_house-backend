@@ -238,8 +238,8 @@ namespace ah_backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Icon")
-                        .HasColumnType("BLOB");
+                    b.Property<string>("IconId")
+                        .HasColumnType("TEXT");
 
                     b.Property<double>("Price")
                         .HasColumnType("REAL");
@@ -254,6 +254,24 @@ namespace ah_backend.Migrations
                     b.ToTable("Auctions");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Auction");
+                });
+
+            modelBuilder.Entity("ah_backend.Models.Image", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(8);
+
+                    b.Property<int>("AuctionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Img")
+                        .HasColumnType("BLOB");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("ah_backend.Models.FinishedAuction", b =>

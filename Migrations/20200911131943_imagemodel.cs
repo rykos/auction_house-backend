@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ah_backend.Migrations
 {
-    public partial class init : Migration
+    public partial class imagemodel : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -54,7 +54,7 @@ namespace ah_backend.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     CreatorId = table.Column<string>(maxLength: 100, nullable: true),
-                    Icon = table.Column<byte[]>(nullable: true),
+                    IconId = table.Column<string>(nullable: true),
                     Title = table.Column<string>(maxLength: 100, nullable: false),
                     Description = table.Column<string>(nullable: false),
                     Price = table.Column<double>(nullable: false),
@@ -66,6 +66,19 @@ namespace ah_backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Auctions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Images",
+                columns: table => new
+                {
+                    Id = table.Column<string>(maxLength: 8, nullable: false),
+                    Img = table.Column<byte[]>(nullable: true),
+                    AuctionId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Images", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -231,6 +244,9 @@ namespace ah_backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Auctions");
+
+            migrationBuilder.DropTable(
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

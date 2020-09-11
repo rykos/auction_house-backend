@@ -11,7 +11,7 @@ namespace ah_backend.Models
         [MaxLength(100)]
         public string CreatorId { get; set; }
 
-        public string Icon { get; set; }
+        public string IconId { get; set; }
 
         [Required(ErrorMessage = "Tile is required")]
         [MaxLength(100)]

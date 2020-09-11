@@ -63,7 +63,8 @@ namespace ah_backend.Controllers
                     id = user.Id,
                     username = user.UserName,
                     token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
+                    expiration = token.ValidTo,
+                    balance = user.Balance
                 });
             }
             return Unauthorized(new { msg = "Invalid username or password" });

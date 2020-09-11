@@ -62,26 +62,21 @@ namespace ah_backend.Controllers
 
         [Authorize]
         [HttpPost]
-        public IActionResult CreateAuction([FromForm] Auction auction, [FromForm] IFormFile icon)
+        public async Task<IActionResult> CreateAuction([FromForm] Auction auction, [FromForm] IFormFile icon)
         {
+            ApplicationUser user = await userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if(user == default){
+                return Unauthorized();
+            }
+
             if (auction != default && auction.Title != default && auction.Description != default && auction.Price != default)
             {
-                auction.CreatorId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                auction.CreatorId = user.Id;
                 if (icon != null)
                 {
                     if (icon.Length < 16000000)
                     {
-                        using (MemoryStream memoryStream = new MemoryStream())
-                        {
-                            icon.CopyTo(memoryStream);
-                            //auction.Icon = memoryStream.ToArray();
-                            string iconFileName = $"images/{auction.CreatorId}_{Guid.NewGuid().ToString()}_{icon.FileName}";
-                            auction.Icon = iconFileName;
-                            using (FileStream fs = new FileStream(Path.Combine("wwwroot", iconFileName), FileMode.Create))
-                            {
-                                fs.Write(memoryStream.ToArray());
-                            }
-                        }
+                        this.SaveImage(icon, ref auction);
                     }
                     else
                     {
@@ -98,56 +93,72 @@ namespace ah_backend.Controllers
             return BadRequest(new Response { Status = "Error", Message = "Missing fields" });
         }
 
-        [Authorize]
-        [HttpPost]
-        [Route("mockAuction/{amount}")]
-        public async Task<List<object>> CreateRandomAuction(int amount)
+        // //Only for testing
+        // [Authorize]
+        // [HttpPost]
+        // [Route("mockAuction/{amount}")]
+        // public async Task<List<object>> CreateMockAuction(int amount)
+        // {
+        //     if (amount < 1)
+        //     {
+        //         return null;
+        //     }
+        //     Random rnd = new Random();
+        //     List<Auction> newAuctions = new List<Auction>();
+        //     string[] titles = { "Buty", "Rekawice", "Naszyjnik", "Pas", "Peleryna" };
+
+        //     string[] filePaths = Directory.GetFiles(@"C:\develop\IMAGES\MOCK_RESOURCES");
+        //     string creatorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //     for (int i = 0; i < amount; i++)
+        //     {
+        //         string filePath = filePaths[rnd.Next(0, filePaths.Length)];
+        //         using (FileStream fs = new FileStream(filePath, FileMode.Open))
+        //         {
+        //             using (MemoryStream ms = new MemoryStream())
+        //             {
+        //                 fs.CopyTo(ms);
+        //                 Auction auction = new Auction()
+        //                 {
+        //                     CreatorId = creatorId,
+        //                     Title = titles[rnd.Next(0, titles.Length)],
+        //                     Description = titles[rnd.Next(0, titles.Length)],
+        //                     Price = rnd.Next(10, 1000) + (rnd.Next(0, 101) / 100d),
+        //                 };
+        //                 string iconFileName = $"images/{auction.CreatorId}_{Guid.NewGuid().ToString()}_{Path.GetFileName(filePath)}";
+        //                 using (FileStream fsc = new FileStream(Path.Combine("wwwroot", iconFileName), FileMode.Create))
+        //                 {
+        //                     fsc.Write(ms.ToArray());
+        //                 }
+        //                 auction.Icon = iconFileName;
+        //                 newAuctions.Add(auction);
+        //                 await dbContext.AddAsync(auction);
+        //             }
+        //         }
+        //     }
+        //     await dbContext.SaveChangesAsync();
+        //     return newAuctions.Select(x => new
+        //     {
+        //         id = x.Id,
+        //         title = x.Title,
+        //         description = x.Description,
+        //         price = x.Price
+        //     }).Cast<object>().ToList();
+        // }
+
+        private void SaveImage(IFormFile icon, ref Auction auction)
         {
-            if (amount < 1)
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                return null;
-            }
-            Random rnd = new Random();
-            List<Auction> newAuctions = new List<Auction>();
-            string[] titles = { "Buty", "Rekawice", "Naszyjnik", "Pas", "Peleryna" };
-
-            string[] filePaths = Directory.GetFiles(@"C:\develop\IMAGES\MOCK_RESOURCES");
-            string creatorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            for (int i = 0; i < amount; i++)
-            {
-                string filePath = filePaths[rnd.Next(0, filePaths.Length)];
-                using (FileStream fs = new FileStream(filePath, FileMode.Open))
+                icon.CopyTo(memoryStream);
+                Image img = new Image()
                 {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        fs.CopyTo(ms);
-                        Auction auction = new Auction()
-                        {
-                            CreatorId = creatorId,
-                            Title = titles[rnd.Next(0, titles.Length)],
-                            Description = titles[rnd.Next(0, titles.Length)],
-                            Price = rnd.Next(10, 1000) + (rnd.Next(0, 101) / 100d),
-                        };
-                        string iconFileName = $"images/{auction.CreatorId}_{Guid.NewGuid().ToString()}_{Path.GetFileName(filePath)}";
-                        using (FileStream fsc = new FileStream(Path.Combine("wwwroot", iconFileName), FileMode.Create))
-                        {
-                            fsc.Write(ms.ToArray());
-                        }
-                        auction.Icon = iconFileName;
-                        newAuctions.Add(auction);
-                        await dbContext.AddAsync(auction);
-                    }
-                }
+                    AuctionId = auction.Id,
+                    Img = memoryStream.ToArray()
+                };
+                auction.IconId = dbContext.Add(img).Entity.Id;
             }
-            await dbContext.SaveChangesAsync();
-            return newAuctions.Select(x => new
-            {
-                id = x.Id,
-                title = x.Title,
-                description = x.Description,
-                price = x.Price
-            }).Cast<object>().ToList();
+            dbContext.SaveChanges();
         }
     }
 }
