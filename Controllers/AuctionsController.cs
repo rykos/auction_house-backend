@@ -41,6 +41,13 @@ namespace ah_backend.Controllers
         }
 
         [HttpGet]
+        [Route("finished")]
+        public Auction[] GetFinishedAuctions()
+        {
+            return this.dbContext.FinishedAuctions.ToArray();
+        }
+
+        [HttpGet]
         [Route("{id}")]
         public Auction GetAuction(int id)
         {
@@ -61,11 +68,40 @@ namespace ah_backend.Controllers
         }
 
         [Authorize]
+        [HttpGet]
+        [Route("my/bought")]
+        public async Task<IActionResult> GeyMyBoughtAuctions()
+        {
+            ApplicationUser user = await this.userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (user == default)
+            {
+                return Unauthorized();
+            }
+            Auction[] auctions = this.dbContext.FinishedAuctions.Where(x => x.BuyerId == user.Id).OrderByDescending(x => x.CreationTime).ToArray();
+            return Ok(auctions);
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("my/sold")]
+        public async Task<IActionResult> GeyMySoldAuctions()
+        {
+            ApplicationUser user = await this.userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (user == default)
+            {
+                return Unauthorized();
+            }
+            Auction[] auctions = this.dbContext.FinishedAuctions.Where(x => x.CreatorId == user.Id).OrderByDescending(x => x.CreationTime).ToArray();
+            return Ok(auctions);
+        }
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateAuction([FromForm] Auction auction, [FromForm] IFormFile icon)
         {
             ApplicationUser user = await userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            if(user == default){
+            if (user == default)
+            {
                 return Unauthorized();
             }
 
@@ -145,6 +181,57 @@ namespace ah_backend.Controllers
         //         price = x.Price
         //     }).Cast<object>().ToList();
         // }
+
+        [HttpPost]
+        [Authorize]
+        [Route("buy")]
+        public async Task<IActionResult> BuyItem([FromBody] TransactionConfirmation transaction)
+        {
+            ApplicationUser user = await userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (user == default)
+            {
+                return Unauthorized();
+            }
+
+            Auction auction = dbContext.Auctions.FirstOrDefault(x => x.Id == transaction.AuctionId);
+            ApplicationUser recipient = await this.userManager.FindByIdAsync(auction.CreatorId);
+
+            if (auction == default || recipient == default)
+            {
+                return NotFound();
+            }
+
+            if (user.Balance < auction.Price)
+            {
+                return BadRequest(new { msg = "Balance is too low" });
+            }
+
+            lock (dbContext.Auctions)
+            {
+                dbContext.Auctions.Remove(auction);
+
+                FinishedAuction finishedAuction = new FinishedAuction()
+                {
+                    Id = auction.Id,
+                    Price = auction.Price,
+                    BuyerId = user.Id,
+                    CreationTime = auction.CreationTime,
+                    CreatorId = auction.CreatorId,
+                    Description = auction.Description,
+                    IconId = auction.IconId,
+                    Title = auction.Title
+                };
+                dbContext.FinishedAuctions.Add(finishedAuction);
+
+                dbContext.Users.UpdateRange(new ApplicationUser[] { user, recipient });
+                user.Balance -= auction.Price;
+                recipient.Balance += auction.Price;
+
+                dbContext.SaveChanges();
+            }
+
+            return Ok();
+        }
 
         private void SaveImage(IFormFile icon, ref Auction auction)
         {

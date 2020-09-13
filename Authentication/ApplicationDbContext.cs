@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ah_backend.Models;
 using Microsoft.AspNetCore.Identity;
+using System;
 
 namespace ah_backend.Authentication
 {
@@ -58,20 +59,6 @@ namespace ah_backend.Authentication
                 b.ToTable("AspNetRoleClaims");
             });
 
-            // builder.Entity<IdentityUserToken<string>>(b =>
-            // {
-            //     // Composite primary key consisting of the UserId, LoginProvider and Name
-            //     b.HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
-
-            //     // Limit the size of the composite key columns due to common DB restrictions
-            //     b.Property(t => t.LoginProvider).HasMaxLength(300);
-            //     b.Property(t => t.Name).HasMaxLength(300);
-
-            //     // Maps to the AspNetUserTokens table
-            //     b.ToTable("AspNetUserTokens");
-            // });
-
-
             builder.Entity<IdentityRole>(b =>
             {
                 // Primary key
@@ -101,6 +88,7 @@ namespace ah_backend.Authentication
                 b.HasMany<IdentityRoleClaim<string>>().WithOne().HasForeignKey(rc => rc.RoleId).IsRequired();
             });
 
+            builder.Entity<FinishedAuction>().HasBaseType((Type)null);
 
             base.OnModelCreating(builder);
         }

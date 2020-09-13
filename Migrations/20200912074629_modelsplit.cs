@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ah_backend.Migrations
 {
-    public partial class imagemodel : Migration
+    public partial class modelsplit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -58,14 +58,31 @@ namespace ah_backend.Migrations
                     Title = table.Column<string>(maxLength: 100, nullable: false),
                     Description = table.Column<string>(nullable: false),
                     Price = table.Column<double>(nullable: false),
-                    CreationTime = table.Column<DateTime>(nullable: false),
-                    Discriminator = table.Column<string>(nullable: false),
-                    BuyerId = table.Column<string>(maxLength: 100, nullable: true),
-                    BuyDateTime = table.Column<DateTime>(nullable: true)
+                    CreationTime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Auctions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FinishedAuctions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CreatorId = table.Column<string>(maxLength: 100, nullable: true),
+                    IconId = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(maxLength: 100, nullable: false),
+                    Description = table.Column<string>(nullable: false),
+                    Price = table.Column<double>(nullable: false),
+                    CreationTime = table.Column<DateTime>(nullable: false),
+                    BuyerId = table.Column<string>(maxLength: 100, nullable: true),
+                    BuyDateTime = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FinishedAuctions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -244,6 +261,9 @@ namespace ah_backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Auctions");
+
+            migrationBuilder.DropTable(
+                name: "FinishedAuctions");
 
             migrationBuilder.DropTable(
                 name: "Images");

@@ -9,8 +9,8 @@ using ah_backend.Authentication;
 namespace ah_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200911131943_imagemodel")]
-    partial class imagemodel
+    [Migration("20200912074629_modelsplit")]
+    partial class modelsplit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -236,7 +236,47 @@ namespace ah_backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Discriminator")
+                    b.Property<string>("IconId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Auctions");
+
+                    b.HasDiscriminator();
+                });
+
+            modelBuilder.Entity("ah_backend.Models.FinishedAuction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("BuyDateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuyerId")
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(100);
+
+                    b.Property<DateTime>("CreationTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatorId")
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -253,9 +293,9 @@ namespace ah_backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Auctions");
+                    b.ToTable("FinishedAuctions");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Auction");
+                    b.HasDiscriminator();
                 });
 
             modelBuilder.Entity("ah_backend.Models.Image", b =>
@@ -274,21 +314,6 @@ namespace ah_backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Images");
-                });
-
-            modelBuilder.Entity("ah_backend.Models.FinishedAuction", b =>
-                {
-                    b.HasBaseType("ah_backend.Models.Auction");
-
-                    b.Property<DateTime>("BuyDateTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("BuyerId")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(100);
-
-                    b.HasDiscriminator().HasValue("FinishedAuction");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
